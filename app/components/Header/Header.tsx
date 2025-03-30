@@ -1,0 +1,40 @@
+import { Link } from "@remix-run/react";
+import { useEffect, useState } from "react";
+
+import Layout from "~/components/Layout";
+
+export default function Header() {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <>
+      <a
+        href="#content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-0 focus:top-0 focus:z-50 focus:m-4 focus:h-auto focus:w-auto focus:overflow-visible focus:whitespace-normal focus:bg-black focus:px-4 focus:py-2 focus:text-white"
+      >
+        Skip to content
+      </a>
+      <header
+        className={`fixed left-0 right-0 top-0 z-20 transition-colors duration-300 ${isScrolled ? "bg-darkGray" : "bg-transparent"}`}
+      >
+        <Layout>
+          <div className="px-4 py-[18px] md:px-10 md:py-8">
+            <Link to="/" className="text-2xl font-bold text-white">
+              RVHPA
+              <span className="sr-only">Home page</span>
+            </Link>
+          </div>
+        </Layout>
+      </header>
+    </>
+  );
+}

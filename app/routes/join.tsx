@@ -91,7 +91,7 @@ export default function Join() {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
+              className="text-gray-700 block text-sm font-medium"
             >
               Email address
             </label>
@@ -107,7 +107,7 @@ export default function Join() {
                 autoComplete="email"
                 aria-invalid={actionData?.errors?.email ? true : undefined}
                 aria-describedby="email-error"
-                className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+                className="border-gray-500 w-full rounded border px-2 py-1 text-lg"
               />
               {actionData?.errors?.email ? (
                 <div className="pt-1 text-red-700" id="email-error">
@@ -120,7 +120,7 @@ export default function Join() {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
+              className="text-gray-700 block text-sm font-medium"
             >
               Password
             </label>
@@ -133,7 +133,7 @@ export default function Join() {
                 autoComplete="new-password"
                 aria-invalid={actionData?.errors?.password ? true : undefined}
                 aria-describedby="password-error"
-                className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+                className="border-gray-500 w-full rounded border px-2 py-1 text-lg"
               />
               {actionData?.errors?.password ? (
                 <div className="pt-1 text-red-700" id="password-error">
@@ -146,12 +146,12 @@ export default function Join() {
           <input type="hidden" name="redirectTo" value={redirectTo} />
           <button
             type="submit"
-            className="w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
+            className="bg-blue-500 hover:bg-blue-600 focus:bg-blue-400 w-full rounded px-4 py-2 text-white"
           >
             Create Account
           </button>
           <div className="flex items-center justify-center">
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-gray-500 text-center text-sm">
               Already have an account?{" "}
               <Link
                 className="text-blue-500 underline"
