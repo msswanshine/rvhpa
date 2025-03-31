@@ -1,5 +1,5 @@
 {
-  "name": "rvhpa-dd97",
+  "name": "rvhpa",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -25,6 +25,7 @@
     "/public/build"
   ],
   "dependencies": {
+    "@flydotio/litestream": "^1.0.1",
     "@prisma/client": "^5.22.0",
     "@remix-run/css-bundle": "^2.16.1",
     "@remix-run/node": "^2.16.1",
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.2.0",
+    "@flydotio/dockerfile": "^0.7.9",
     "@remix-run/dev": "^2.16.1",
     "@testing-library/cypress": "^10.0.2",
     "@testing-library/jest-dom": "^6.6.3",
@@ -86,5 +88,8 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "dockerfile": {
+    "litestream": true
   }
 }
