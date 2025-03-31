@@ -34,7 +34,7 @@ export default function Header({ user }: { user: User | undefined }) {
               RVHPA
               <span className="sr-only">Home page</span>
             </Link>
-            <div className="mr-14">
+            <div className="mr-14 flex items-center gap-2">
               {user && <p className="text-white">{`Welcome, ${user.email}`}</p>}
               <Link to={user ? "/logout" : "/login"}>
                 <LoginIcon color="white" />
