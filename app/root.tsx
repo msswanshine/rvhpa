@@ -8,10 +8,14 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 
 import { getUser } from "~/session.server";
 import stylesheet from "~/tailwind.css";
+
+import HeaderElements from "./components/Header/HeaderElements";
+
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
@@ -23,6 +27,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function App() {
+  const { user } = useLoaderData<typeof loader>();
+  console.log('user', user);
   return (
     <html lang="en" className="h-full">
       <head>
@@ -31,11 +37,14 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="h-full">
-        <Outlet />
+      <body className="h-full bg-gray">
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <HeaderElements user={user} />
+        <main id="content">
+          <Outlet />
+        </main>
       </body>
     </html>
   );

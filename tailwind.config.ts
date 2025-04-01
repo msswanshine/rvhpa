@@ -3,17 +3,36 @@ import type { Config } from "tailwindcss";
 export default {
   content: ["./app/**/*.{js,jsx,ts,tsx}"],
   theme: {
+    screens: {
+      'xs': '360px',
+      'sm': '640px',
+      // => @media (min-width: 640px) { ... }
+
+      'md': '768px',
+      // => @media (min-width: 768px) { ... }
+
+      'lg': '1024px',
+      // => @media (min-width: 1024px) { ... }
+
+      'xl': '1280px',
+      // => @media (min-width: 1280px) { ... }
+
+      '2xl': '1536px',
+      // => @media (min-width: 1536px) { ... }
+      
+      '3xl': '2000px',
+      // => @media (min-width: 2000px) { ... }
+    },
     extend: {
       colors: {
         black: "#000000",
+        darkGray: "#202020",
         white: "#FFFFFF",
-        blue: "#74B3CE",
-        cloud: "#F1F5F9",
-        green: "#68B984",
-        yellow: "#FFD166",
-        gold: "#E8A87C",
-        darkGreen: "#2C514C",
-        gray: "#5C6B73",
+        gray: "#505050",
+        blue: "#4A90E2",
+        purple: "#9013FE",
+        green: "#13FE90",
+        gold: "#D4AF37"
       },
     },
   },
