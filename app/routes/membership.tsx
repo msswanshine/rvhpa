@@ -117,12 +117,23 @@ export default function Membership() {
           Welcome to the Rogue Valley Hang Gliding and Paragliding Association.
           {user?.member ? " Update your membership details below." : " Complete the form below to become a member."}
         </p>
-        <MembershipForm 
-          user={user} 
-          member={user?.member} 
-          errors={actionData?.errors} 
-          defaultValues={actionData?.data} 
-        />
+        <div className="flex flex-row justify-evenly gap-4 bg-white rounded-lg p-4 text-black">
+          <MembershipForm 
+            user={user} 
+            member={user?.member} 
+            errors={actionData?.errors} 
+            defaultValues={actionData?.data} 
+          />
+          <div>
+            <h2>Current Membership Details:</h2>
+            <p>
+              {user?.member?.firstName} {user?.member?.lastName}
+            </p>
+            <p>
+              {user?.member?.email}
+            </p>
+          </div>
+        </div>
       </div>
     </Layout>
   );
