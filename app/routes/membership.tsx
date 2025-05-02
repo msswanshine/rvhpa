@@ -1,21 +1,113 @@
-import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import type { User, Member } from "@prisma/client";
+import { json, LoaderFunctionArgs, ActionFunctionArgs, redirect } from "@remix-run/node";
+import { useLoaderData, useActionData } from "@remix-run/react";
 
-
+import MembershipForm from "~/components/Forms/Membership";
 import Layout from "~/components/Layout";
-import { getUserById } from "~/models/user.server";
+import { getUserById, createMember, updateMember } from "~/models/user.server";
 import { getUserId } from "~/session.server";
+
+interface MembershipFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  emailConfirmation: string;
+}
+
+interface LoaderData {
+  user: Awaited<ReturnType<typeof getUserById>>;
+}
+
+interface ActionData {
+  errors?: Record<string, string>;
+  data?: MembershipFormData;
+}
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request);
-  const user = userId ? await getUserById(userId) : null;
-  return json({ user });
+  if (!userId) {
+    return redirect("/login");
+  }
+  const user = await getUserById(userId);
+  return json<LoaderData>({ user });
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const userId = await getUserId(request);
+  if (!userId) {
+    return json<ActionData>(
+      { errors: { form: "You must be logged in to submit a membership application." } },
+      { status: 401 }
+    );
+  }
+
+  const formData = await request.formData();
+  const rawData = Object.fromEntries(formData);
+  const data: MembershipFormData = {
+    firstName: String(rawData.firstName || ""),
+    lastName: String(rawData.lastName || ""),
+    email: String(rawData.email || ""),
+    emailConfirmation: String(rawData.emailConfirmation || ""),
+  };
+
+  // Validate required fields
+  const errors: Record<string, string> = {};
+  
+  if (!data.firstName) {
+    errors.firstName = "First name is required";
+  }
+  if (!data.lastName) {
+    errors.lastName = "Last name is required";
+  }
+  if (!data.email) {
+    errors.email = "Email is required";
+  } else if (!data.email.includes("@")) {
+    errors.email = "Please enter a valid email address";
+  }
+  if (data.email !== data.emailConfirmation) {
+    errors.emailConfirmation = "Email addresses do not match";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return json<ActionData>({
+      errors,
+      data,
+    }, { status: 400 });
+  }
+
+  try {
+    const user = await getUserById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const memberData = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+    };
+
+    if (user.member) {
+      await updateMember(userId, memberData);
+    } else {
+      await createMember(userId, memberData);
+    }
+
+    return redirect("/membership/success");
+  } catch (error) {
+    console.error("Error processing membership:", error);
+    return json<ActionData>({
+      errors: { 
+        form: "An error occurred while processing your membership. Please try again." 
+      },
+      data,
+    }, { status: 500 });
+  }
 };
 
 export default function Membership() {
   const { user } = useLoaderData<typeof loader>();
-  const formStyle = "border-blue flex-1 rounded-md border-2 px-3 text-lg leading-loose text-black";
-
+  const actionData = useActionData<typeof action>();
 
   return (
     <Layout>
@@ -23,297 +115,14 @@ export default function Membership() {
         <h1>Hi {user?.email}</h1>
         <p>
           Welcome to the Rogue Valley Hang Gliding and Paragliding Association.
+          {user?.member ? " Update your membership details below." : " Complete the form below to become a member."}
         </p>
-        <Form method="post">
-          <div className="flex flex-col gap-4 max-w-2xl">
-            <div>
-              <fieldset className="flex w-full flex-col gap-1">
-                <legend>Membership Type:</legend>
-                <div className="flex gap-4 mt-1">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="membershipType"
-                      value="localPilot"
-                      required
-                      className="h-4 w-4"
-                    />
-                    <span>Local Pilot</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="membershipType" 
-                      value="visitingPilot"
-                      required
-                      className="h-4 w-4"
-                    />
-                    <span>Visiting Pilot</span>
-                  </label>
-                </div>
-              </fieldset>
-            </div>
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>First Name:</span>
-                <input
-                  name="firstName"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Last Name:</span>
-                <input
-                  name="lastName"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>USHPA Membership ID:</span>
-                <input
-                  name="ushpaMembershipId"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Paraglider Rating:</span>
-                <select
-                  name="paragliderRating"
-                  required
-                  className={formStyle}
-                >
-                  <option value="P1">P1</option>
-                  <option value="P2">P2</option>
-                  <option value="P3">P3</option>
-                  <option value="P4">P4</option>
-                  <option value="P5">P5</option>
-                </select>
-              </label>
-            </div>
-
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Hang Glider Rating:</span>
-                <select
-                  name="hangGliderRating"
-                  required
-                  className={formStyle}
-                >
-                  <option value="H1">H1</option>
-                  <option value="H2">H2</option>
-                  <option value="H3">H3</option>
-                  <option value="H4">H4</option>
-                  <option value="H5">H5</option>
-                </select>
-              </label>
-            </div>
-
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Other Ratings (Instructor, tandem, etc.):</span>
-                <input
-                  name="otherRatings"
-                  className={formStyle}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Email:</span>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  defaultValue={user?.email}
-                  className={formStyle}
-                />
-              </label>
-            </div>
-
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Confirm Email:</span>
-                <input
-                  name="emailConfirmation" 
-                  type="email"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Mobile Number:</span>
-                <input
-                  name="mobileNumber"
-                  type="tel"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-            <div>
-              <fieldset className="flex w-full flex-col gap-1">
-                <legend>Option to share phone number</legend>
-                <span className="text-sm">Is it OK to share your phone number on the RVHPA website for other members to contact you for coordination or emergencies?</span>
-                <div className="flex gap-4 mt-1">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="sharePhone"
-                      value="yes"
-                      defaultChecked
-                      className="border-blue"
-                    />
-                    <span>Yes</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="sharePhone" 
-                      value="no"
-                      className="border-blue"
-                    />
-                    <span>No</span>
-                  </label>
-                </div>
-              </fieldset>
-            </div>
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Tracker URL:</span>
-                <input
-                  name="trackerUrl"
-                  type="url"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Street Address:</span>
-                <input
-                  name="streetAddress"
-                  type="text"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Apartment/Suite/Unit (optional):</span>
-                <input
-                  name="unit"
-                  type="text"
-                  className={formStyle}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>City:</span>
-                <input
-                  name="city"
-                  type="text"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>State:</span>
-                <input
-                  name="state"
-                  type="text"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>ZIP Code:</span>
-                <input
-                  name="zipCode"
-                  type="text"
-                  required
-                  pattern="[0-9]{5}"
-                  className={formStyle}
-                />
-              </label>
-            </div>
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Country:</span>
-                <input
-                  name="country"
-                  type="text"
-                  required
-                  defaultValue="United States"
-                  className={formStyle}
-                />
-              </label>
-            </div>
-
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Glider (Make, model, and colors):</span>
-                <input
-                  name="glider"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Emergency Contact Name and Relationship:</span>
-                <input
-                  name="emergencyContactName"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-
-            <div>
-              <label className="flex w-full flex-col gap-1">
-                <span>Emergency Contact Phone Number:</span>
-                <input
-                  name="emergencyContactPhone"
-                  type="tel"
-                  required
-                  className={formStyle}
-                />
-              </label>
-            </div>
-
-            <div className="text-right">
-              <button
-                type="submit"
-                className="bg-blue hover:bg-blue-80 rounded px-4 py-2 text-white"
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </Form>
+        <MembershipForm 
+          user={user} 
+          member={user?.member} 
+          errors={actionData?.errors} 
+          defaultValues={actionData?.data} 
+        />
       </div>
     </Layout>
   );

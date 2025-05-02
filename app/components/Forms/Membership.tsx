@@ -1,14 +1,19 @@
+import type { User, Member } from "@prisma/client";
 import { Form } from "@remix-run/react";
-
-import type { User } from "~/models/user.server";
 
 interface MembershipFormProps {
   user: User | null;
+  member: Member | null;
   errors?: Record<string, string>;
-  defaultValues?: Record<string, string>;
+  defaultValues?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    emailConfirmation?: string;
+  };
 }
 
-export default function Membership({ user, errors, defaultValues }: MembershipFormProps) {
+export default function Membership({ user, member, errors, defaultValues }: MembershipFormProps) {
   const formStyle = "border-blue flex-1 rounded-md border-2 px-3 text-lg leading-loose text-black";
   const errorStyle = "text-red-500 text-sm mt-1";
 

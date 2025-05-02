@@ -1,16 +1,22 @@
-import type { Password, User } from "@prisma/client";
+import type { Password, User, Member } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "~/db.server";
 
-export type { User } from "@prisma/client";
+export type { User, Member } from "@prisma/client";
 
 export async function getUserById(id: User["id"]) {
-  return prisma.user.findUnique({ where: { id } });
+  return prisma.user.findUnique({ 
+    where: { id },
+    include: { member: true }
+  });
 }
 
 export async function getUserByEmail(email: User["email"]) {
-  return prisma.user.findUnique({ where: { email } });
+  return prisma.user.findUnique({ 
+    where: { email },
+    include: { member: true }
+  });
 }
 
 export async function createUser(email: User["email"], password: string) {
@@ -25,6 +31,44 @@ export async function createUser(email: User["email"], password: string) {
         },
       },
     },
+    include: { member: true }
+  });
+}
+
+export async function createMember(
+  userId: User["id"],
+  data: { firstName: string; lastName: string; email: string }
+) {
+  return prisma.member.create({
+    data: {
+      ...data,
+      user: {
+        connect: { id: userId }
+      }
+    }
+  });
+}
+
+export async function updateMember(
+  userId: User["id"],
+  data: { firstName?: string; lastName?: string; email?: string }
+) {
+  return prisma.member.update({
+    where: { userId },
+    data
+  });
+}
+
+export async function getMemberByUserId(userId: User["id"]) {
+  return prisma.member.findUnique({
+    where: { userId }
+  });
+}
+
+export async function updateUser(id: User["id"], data: { firstName?: string; lastName?: string }) {
+  return prisma.user.update({
+    where: { id },
+    data,
   });
 }
 
@@ -40,6 +84,7 @@ export async function verifyLogin(
     where: { email },
     include: {
       password: true,
+      member: true,
     },
   });
 
