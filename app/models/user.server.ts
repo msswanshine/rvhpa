@@ -1,32 +1,48 @@
-import type { Password, User, Member } from "@prisma/client";
+import type { Password, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "~/db.server";
 
-export type { User, Member } from "@prisma/client";
+export type { User } from "@prisma/client";
 
-export type UserWithMember = User & {
+export interface Member {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+}
+
+export interface UserWithMember {
+  id: string;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
   member: Member | null;
-};
+}
 
 export async function getUserById(id: User["id"]): Promise<UserWithMember | null> {
-  return prisma.user.findUnique({ 
+  const result = await prisma.user.findUnique({ 
     where: { id },
     include: { member: true }
   });
+  return result as unknown as UserWithMember | null;
 }
 
-export async function getUserByEmail(email: User["email"]) {
-  return prisma.user.findUnique({ 
+export async function getUserByEmail(email: User["email"]): Promise<UserWithMember | null> {
+  const result = await prisma.user.findUnique({ 
     where: { email },
     include: { member: true }
   });
+  return result as unknown as UserWithMember | null;
 }
 
-export async function createUser(email: User["email"], password: string) {
+export async function createUser(email: User["email"], password: string): Promise<UserWithMember> {
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  return prisma.user.create({
+  const result = await prisma.user.create({
     data: {
       email,
       password: {
@@ -37,6 +53,7 @@ export async function createUser(email: User["email"], password: string) {
     },
     include: { member: true }
   });
+  return result as unknown as UserWithMember;
 }
 
 export async function createMember(
@@ -50,7 +67,7 @@ export async function createMember(
         connect: { id: userId }
       }
     }
-  });
+  }) as unknown as Member;
 }
 
 export async function updateMember(
@@ -60,13 +77,13 @@ export async function updateMember(
   return prisma.member.update({
     where: { userId },
     data
-  });
+  }) as unknown as Member;
 }
 
 export async function getMemberByUserId(userId: User["id"]) {
   return prisma.member.findUnique({
     where: { userId }
-  });
+  }) as unknown as Member | null;
 }
 
 export async function updateUser(id: User["id"], data: { firstName?: string; lastName?: string }) {
@@ -89,8 +106,8 @@ export async function verifyLogin(
     include: {
       password: true,
       member: true,
-    },
-  });
+    }
+  }) as unknown as (UserWithMember & { password: Password }) | null;
 
   if (!userWithPassword || !userWithPassword.password) {
     return null;
