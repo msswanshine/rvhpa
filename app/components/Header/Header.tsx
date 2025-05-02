@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link, Form } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
 import LoginIcon from "~/components/Icons/LoginIcon";
@@ -10,7 +10,7 @@ export default function Header({ user }: { user: User | undefined }) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 0);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -36,10 +36,45 @@ export default function Header({ user }: { user: User | undefined }) {
             </Link>
             <div className="mr-14 flex items-center gap-2">
               {user && <p className="text-white">{`Welcome, ${user.email}`}</p>}
-              <Link to={user ? "/logout" : "/login"}>
-                <LoginIcon color="white" />
-                <span className="sr-only">{user ? "Logout" : "Login"}</span>
-              </Link>
+              {user ? (
+                <div className="relative group">
+                  <button
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    className="flex items-center focus:outline-none"
+                  >
+                    <LoginIcon color="white" />
+                    <span className="sr-only">Account menu</span>
+                  </button>
+                  <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
+                    <div className="py-1" role="menu" aria-orientation="vertical">
+                      <Link
+                        to="/membership"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        role="menuitem"
+                      >
+                        Membership
+                      </Link>
+                      <Form action="/logout" method="post">
+                        <button
+                          type="submit"
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          role="menuitem"
+                        >
+                          Logout
+                        </button>
+                      </Form>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Link to="/login" aria-label="Login" className="relative group">
+                  <LoginIcon color="white" />
+                  <div className="absolute -left-3 top-8 rounded hidden bg-white px-2 py-1 text-sm text-black group-hover:block group-focus:block">
+                    Login
+                  </div>
+                </Link>
+              )}
             </div>
           </div>
         </Layout>
