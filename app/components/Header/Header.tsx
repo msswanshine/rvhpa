@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 
 import LoginIcon from "~/components/Icons/LoginIcon";
 import Layout from "~/components/Layout";
-import type { User } from "~/types/user";
+import type { UserWithMember } from "~/models/user.server";
 
-export default function Header({ user }: { user: User | undefined }) {
+export default function Header({ user }: { user: UserWithMember | undefined }) {
   const [isScrolled, setIsScrolled] = useState(false);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,7 +36,15 @@ export default function Header({ user }: { user: User | undefined }) {
               <span className="sr-only">Home page</span>
             </Link>
             <div className="mr-14 flex items-center gap-2">
-              {user && <p className="text-white">{`Welcome, ${user.email}`}</p>}
+              {user && (
+                <p className="text-white">
+                  {`Welcome, ${
+                    user.member?.firstName && user.member?.lastName
+                      ? `${user.member?.firstName} ${user.member?.lastName}`
+                      : user.email
+                  }`}
+                </p>
+              )}
               {user ? (
                 <div className="relative group">
                   <button
