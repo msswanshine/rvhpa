@@ -9,6 +9,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Member" (
     "id" TEXT NOT NULL PRIMARY KEY,
+    "membershipType" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,

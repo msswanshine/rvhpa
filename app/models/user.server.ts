@@ -10,6 +10,7 @@ export interface Member {
   firstName: string;
   lastName: string;
   email: string;
+  membershipType: string;
   createdAt: Date;
   updatedAt: Date;
   userId: string;

@@ -7,6 +7,7 @@ import { getUserById, createMember, updateMember, type UserWithMember } from "~/
 import { getUserId } from "~/session.server";
 
 interface MembershipFormData {
+  membershipType: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -47,11 +48,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     lastName: String(rawData.lastName || ""),
     email: String(rawData.email || ""),
     emailConfirmation: String(rawData.emailConfirmation || ""),
+    membershipType: String(rawData.membershipType || ""),
   };
 
   // Validate required fields
   const errors: Record<string, string> = {};
-  
+
+  if (!data.membershipType) {
+    errors.membershipType = "Membership type is required";
+  }
+
   if (!data.firstName) {
     errors.firstName = "First name is required";
   }
@@ -84,6 +90,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
+      membershipType: data.membershipType,
     };
 
     if (user.member) {
@@ -125,6 +132,9 @@ export default function Membership() {
           />
           <div>
             <h2>Current Membership Details:</h2>
+            <p>
+              {user?.member?.membershipType}
+            </p>
             <p>
               {user?.member?.firstName} {user?.member?.lastName}
             </p>

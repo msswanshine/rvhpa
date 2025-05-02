@@ -16,8 +16,6 @@ interface MembershipFormProps {
 export default function MembershipForm({ user, errors, defaultValues }: MembershipFormProps) {
   const formStyle = "border-blue flex-1 rounded-md border-2 px-3 text-lg leading-loose text-black";
   const errorStyle = "text-red-500 text-sm mt-1";
-
-  const member = user?.member;
   
   return (
     <Form method="post">

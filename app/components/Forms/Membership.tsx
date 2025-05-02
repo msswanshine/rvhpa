@@ -7,6 +7,7 @@ interface MembershipFormProps {
   user: UserWithMember | null;
   errors?: Record<string, string>;
   defaultValues?: {
+    membershipType?: string;
     firstName?: string;
     lastName?: string;
     email?: string;
@@ -26,6 +27,40 @@ export default function MembershipForm({ user, errors, defaultValues }: Membersh
             {errors.form}
           </div>
         )}
+
+        <div>
+          <fieldset className="flex w-full flex-col gap-1">
+            <legend>Membership Type:</legend>
+            <div className="flex gap-4 mt-1">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="membershipType"
+                  value="localPilot"
+                  required
+                  className="h-4 w-4"
+                  defaultChecked={user?.member?.membershipType === "localPilot" ? true : false}
+                />
+                <span>Local Pilot</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="membershipType" 
+                  value="visitingPilot"
+                  required
+                  className="h-4 w-4"
+                  defaultChecked={user?.member?.membershipType === "visitingPilot" ? true : false}
+                />
+                <span>Visiting Pilot</span>
+              </label>
+            </div>
+            {errors?.membershipType && (
+              <div className={errorStyle}>{errors.membershipType}</div>
+            )}
+          </fieldset>
+        </div>
+
         <div>
           <label className="flex w-full flex-col gap-1">
             <span>First Name:</span>
@@ -34,6 +69,7 @@ export default function MembershipForm({ user, errors, defaultValues }: Membersh
               required
               className={formStyle}
               defaultValue={defaultValues?.firstName}
+              placeholder={user?.member?.firstName}
             />
             {errors?.firstName && (
               <div className={errorStyle}>{errors.firstName}</div>
@@ -49,6 +85,7 @@ export default function MembershipForm({ user, errors, defaultValues }: Membersh
               required
               className={formStyle}
               defaultValue={defaultValues?.lastName}
+              placeholder={user?.member?.lastName}
             />
             {errors?.lastName && (
               <div className={errorStyle}>{errors.lastName}</div>
@@ -64,6 +101,7 @@ export default function MembershipForm({ user, errors, defaultValues }: Membersh
               required
               defaultValue={defaultValues?.email || user?.email}
               className={formStyle}
+              placeholder={user?.member?.email}
             />
             {errors?.email && (
               <div className={errorStyle}>{errors.email}</div>
@@ -86,6 +124,9 @@ export default function MembershipForm({ user, errors, defaultValues }: Membersh
             )}
           </label>
         </div>
+
+        
+
         <div className="text-right">
           <button
             type="submit"
