@@ -21,6 +21,7 @@ interface LoaderData {
 interface ActionData {
   errors?: Record<string, string>;
   data?: MembershipFormData;
+  success?: string;
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -99,7 +100,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       await createMember(userId, memberData);
     }
 
-    return redirect("/membership/success");
+    // TODO: Send success message in the form of a popup or alert.
+    return json<ActionData>({
+      data,
+      success: "Membership updated successfully!"
+    });
+
   } catch (error) {
     console.error("Error processing membership:", error);
     return json<ActionData>({

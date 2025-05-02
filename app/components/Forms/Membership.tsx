@@ -30,6 +30,9 @@ export default function MembershipForm({ user, errors, defaultValues }: Membersh
 
         <div>
           <fieldset className="flex w-full flex-col gap-1">
+            {/* TODO: Log this field into place until the membershipExpirationDate has passed, and the user can reassign 
+            This should also be attached to a "membership renewal" button that will be visible to the user when the membershipExpirationDate has passed, which 
+            will allow them to renew their membership and pay for the next year. */}
             <legend>Membership Type:</legend>
             <div className="flex gap-4 mt-1">
               <label className="flex items-center gap-2">
@@ -69,7 +72,7 @@ export default function MembershipForm({ user, errors, defaultValues }: Membersh
               required
               className={formStyle}
               defaultValue={defaultValues?.firstName}
-              placeholder={user?.member?.firstName}
+              value={user?.member?.firstName}
             />
             {errors?.firstName && (
               <div className={errorStyle}>{errors.firstName}</div>
@@ -85,7 +88,7 @@ export default function MembershipForm({ user, errors, defaultValues }: Membersh
               required
               className={formStyle}
               defaultValue={defaultValues?.lastName}
-              placeholder={user?.member?.lastName}
+              value={user?.member?.lastName}
             />
             {errors?.lastName && (
               <div className={errorStyle}>{errors.lastName}</div>
@@ -101,7 +104,7 @@ export default function MembershipForm({ user, errors, defaultValues }: Membersh
               required
               defaultValue={defaultValues?.email || user?.email}
               className={formStyle}
-              placeholder={user?.member?.email}
+              value={user?.member?.email}
             />
             {errors?.email && (
               <div className={errorStyle}>{errors.email}</div>
