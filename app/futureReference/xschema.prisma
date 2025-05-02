@@ -10,8 +10,26 @@ generator client {
 model User {
   id                    String @id @default(cuid())
   email                 String @unique
+  membershipType        String @default("")
+  membershipActive      Boolean @default(true)
+  membershipExpires     DateTime? 
   firstName             String @default("")
   lastName              String @default("")
+  streetAddress         String?
+  unit                  String?
+  city                  String @default("")
+  state                 String @default("")
+  zipCode               String @default("00000")
+  country               String @default("")
+  ushpaMembershipId     String @default("")
+  paragliderRating      String?
+  hangGliderRating      String?
+  otherRatings          String?
+  mobileNumber          String @default("")
+  sharePhone            Boolean
+  trackerUrl            String @default("")
+  emergencyContactName  String @default("")
+  emergencyContactPhone String @default("")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
