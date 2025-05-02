@@ -5,7 +5,11 @@ import { prisma } from "~/db.server";
 
 export type { User, Member } from "@prisma/client";
 
-export async function getUserById(id: User["id"]) {
+export type UserWithMember = User & {
+  member: Member | null;
+};
+
+export async function getUserById(id: User["id"]): Promise<UserWithMember | null> {
   return prisma.user.findUnique({ 
     where: { id },
     include: { member: true }

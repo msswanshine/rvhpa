@@ -1,10 +1,9 @@
-import type { User, Member } from "@prisma/client";
 import { json, LoaderFunctionArgs, ActionFunctionArgs, redirect } from "@remix-run/node";
 import { useLoaderData, useActionData } from "@remix-run/react";
 
 import MembershipForm from "~/components/Forms/Membership";
 import Layout from "~/components/Layout";
-import { getUserById, createMember, updateMember } from "~/models/user.server";
+import { getUserById, createMember, updateMember, type UserWithMember } from "~/models/user.server";
 import { getUserId } from "~/session.server";
 
 interface MembershipFormData {
@@ -15,7 +14,7 @@ interface MembershipFormData {
 }
 
 interface LoaderData {
-  user: Awaited<ReturnType<typeof getUserById>>;
+  user: UserWithMember | null;
 }
 
 interface ActionData {
