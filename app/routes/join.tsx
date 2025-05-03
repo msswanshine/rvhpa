@@ -86,8 +86,8 @@ export default function Join() {
 
   return (
     <div className="flex min-h-full flex-col justify-center">
-      <div className="mx-auto w-full max-w-md px-8">
-        <Form method="post" className="space-y-6">
+      <div className="mx-auto w-full max-w-md px-8 mt-40">
+        <Form method="post" className="space-y-6 text-white">
           <div>
             <label
               htmlFor="email"
@@ -146,7 +146,7 @@ export default function Join() {
           <input type="hidden" name="redirectTo" value={redirectTo} />
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-600 focus:bg-blue-400 w-full rounded px-4 py-2 text-white"
+            className="bg-blue-500 hover:bg-blue-600 focus:bg-blue-400 w-full rounded px-4 py-2 text-white border-2 border-white"
           >
             Create Account
           </button>

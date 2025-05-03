@@ -120,16 +120,18 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function Membership() {
   const { user } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+  const userName = user?.member?.firstName && user?.member?.lastName ? `${user?.member?.firstName} ${user?.member?.lastName}` : user?.email;
 
   return (
     <Layout>
       <div className="px-5 md:px-10 pt-20 text-white">
-        <h1>Hi {user?.email}</h1>
+        <h1 className="text-2xl font-bold">Welcome, {userName}!</h1>
         <p>
-          Welcome to the Rogue Valley Hang Gliding and Paragliding Association.
-          {user?.member ? " Update your membership details below." : " Complete the form below to become a member."}
+          This is your account page for the Rogue Valley Hang Gliding and Paragliding Association.
+          <br />
+          {user?.member ? " Please feel free to update your membership details below." : " Please complete the form below to start your membership process."}
         </p>
-        <div className="flex flex-row justify-evenly gap-4 bg-white rounded-lg p-4 text-black">
+        <div className="flex flex-row justify-evenly gap-4 bg-white rounded-lg p-4 text-black mt-10">
           <MembershipForm 
             user={user} 
             member={user?.member} 
